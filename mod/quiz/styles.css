@@ -1122,6 +1122,11 @@ table#categoryquestions {
     list-style: none;
 }
 
+/* Wrap button text. */
+#page-mod-quiz-edit .randomquestionformforpopup input[name=addrandomquestionfromeachsubcategory] {
+    white-space: normal;
+}
+
 /** Print formatting for attempt and review pages **/
 
 @media print {

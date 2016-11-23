@@ -254,3 +254,11 @@ Feature: Edit quiz page - adding things
     And I should see "Essay 02" on quiz page "3"
     And I should see "Random" on quiz page "4"
     And I should see "Essay for page 4" on quiz page "4"
+
+  @javascript
+  Scenario: Create category and add random question
+    Given I open the "last" add to quiz menu
+    And I follow "a random question"
+    When I set the field "id_name" to "New Category"
+    And I press "Create category and add random question"
+    Then I should see "Random (New Category)"

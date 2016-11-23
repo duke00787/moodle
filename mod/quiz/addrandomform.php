@@ -47,6 +47,7 @@ class quiz_add_random_form extends moodleform {
         // Random from existing category section.
         $mform->addElement('header', 'categoryheader',
                 get_string('randomfromexistingcategory', 'quiz'));
+        $mform->addHelpButton('categoryheader', 'addrandomquestionfromeachsubcategory', 'quiz');
 
         $mform->addElement('questioncategory', 'category', get_string('category'),
                 array('contexts' => $usablecontexts, 'top' => false));
@@ -58,6 +59,9 @@ class quiz_add_random_form extends moodleform {
                 $this->get_number_of_questions_to_add_choices());
 
         $mform->addElement('submit', 'existingcategory', get_string('addrandomquestion', 'quiz'));
+        $mform->addElement('submit', 'addrandomquestionfromeachsubcategory', get_string('addrandomquestionfromeachsubcategory', 'quiz'));
+
+        $mform->disabledIf('addrandomquestionfromeachsubcategory', 'category', 'in', $this->get_categories_without_subcategories());
 
         // Random from a new category section.
         $mform->addElement('header', 'categoryheader',
@@ -109,5 +113,32 @@ class quiz_add_random_form extends moodleform {
             $randomcount[$i] = $i;
         }
         return $randomcount;
+    }
+
+    /**
+     * Return all categories which don't have subcategories.
+     * @param string $sortorder
+     * @return array Array of "$category->id,$category->context->id"
+     */
+    protected function get_categories_without_subcategories($sortorder = 'sortorder, name ASC') {
+        global $DB;
+
+        $categorieswithoutsubcategories = $DB->get_records_sql(
+            "SELECT c.id, c.contextid
+               FROM {question_categories} c
+              WHERE NOT EXISTS (
+                  SELECT NULL
+                    FROM {question_categories}
+                   WHERE parent = c.id
+              )
+              ORDER BY $sortorder"
+        );
+
+        $optionsvalue = [];
+        foreach ($categorieswithoutsubcategories as $category) {
+            $optionsvalue[] = "$category->id,$category->contextid";
+        }
+
+        return $optionsvalue;
     }
 }
